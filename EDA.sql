@@ -123,10 +123,53 @@ select
 from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-2018`;
 
 
+
+-- Get global success rate on Kickstart Platform : 36.46%
+with result as (
+  select
+    status,
+    count(*) as nr
+  from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+  group by status
+)
 select
-  status,
-  count(*) as nr
-from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
-group by status
+  ROUND((select result.nr from result where status=1)/SUM(nr) * 100, 2) as success_rate,
+  ROUND((select result.nr from result where status=0)/SUM(nr) * 100, 2) as failure_rate
+from result;
   
+
+-- What factors decide status
+
+-- getting all columns
+SELECT 
+  column_name, 
+  data_type
+FROM `data-analytics-ns-470609.kickstarter_project_analysis`.INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'ks-projects-clean'
+ORDER BY ordinal_position;
+  
+
+
+-- using visualization on looker to explore trends faster
+
+select
+  currency,
+  goal,
+  usd_goal_real,
+  pledged,
+  `usd pledged`,
+  usd_pledged_real
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+order by 5 desc
+limit 30;
+
+-- dropping usd_* columns as it is not relevant for the analysis
+
+-- alter table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+-- drop column `usd pledged`, `usd_pledged_real`, `usd_goal_real`;
+
+create or replace table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean` as
+select
+  * except (`usd pledged`, `usd_pledged_real`, `usd_goal_real`)
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
   

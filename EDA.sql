@@ -123,10 +123,95 @@ select
 from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-2018`;
 
 
+
+-- Get global success rate on Kickstart Platform : 36.46%
+with result as (
+  select
+    status,
+    count(*) as nr
+  from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+  group by status
+)
 select
-  status,
-  count(*) as nr
-from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
-group by status
+  ROUND((select result.nr from result where status=1)/SUM(nr) * 100, 2) as success_rate,
+  ROUND((select result.nr from result where status=0)/SUM(nr) * 100, 2) as failure_rate
+from result;
   
+
+-- What factors decide status
+
+-- getting all columns
+SELECT 
+  column_name, 
+  data_type
+FROM `data-analytics-ns-470609.kickstarter_project_analysis`.INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'ks-projects-clean'
+ORDER BY ordinal_position;
+  
+
+
+-- using visualization on looker to explore trends faster
+
+select
+  currency,
+  goal,
+  usd_goal_real,
+  pledged,
+  `usd pledged`,
+  usd_pledged_real
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+order by 5 desc
+limit 30;
+
+-- dropping usd_* columns as it is not relevant for the analysis
+
+-- alter table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+-- drop column `usd pledged`, `usd_pledged_real`, `usd_goal_real`;
+
+create or replace table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean` as
+select
+  * except (`usd pledged`, `usd_pledged_real`, `usd_goal_real`)
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+
+-- distinct main_categories
+
+-- Analyzing by category -- aggregated 
+create or replace table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-category` as
+select
+  main_category,
+  SUM(status) as successful,
+  count(*) as total_pitches,
+  ROUND(SAFE_DIVIDE(SUM(status),count(*)) * 100, 2) as success_rate
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+group by main_category
+order by 2 desc, 3 desc;
+
+-- Date Range for deadlines: 2009-05-03	until 2018-03-03
+
+select
+  min(deadline),
+  max(deadline)
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+-- Launched date: 1970-01-01 01:00:00 UTC	until 2018-01-02 15:02:31 UTC
+select
+  min(launched),
+  max(launched)
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+select
+  *
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+where launched <= '2009-01-01'
+order by 1 asc;
+/* >> found 7 entries with mismatch launch date, and they all were cancelled - probably the reason for these wrong entries
+"""
+for the sake of clear timeline, decided to drop them
+"""
+*/
+
+delete from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+ where launched <= '2009-01-01';
+
   

@@ -124,20 +124,6 @@ from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-2018`;
 
 
 
--- Get global success rate on Kickstart Platform : 36.46%
-with result as (
-  select
-    status,
-    count(*) as nr
-  from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
-  group by status
-)
-select
-  ROUND((select result.nr from result where status=1)/SUM(nr) * 100, 2) as success_rate,
-  ROUND((select result.nr from result where status=0)/SUM(nr) * 100, 2) as failure_rate
-from result;
-  
-
 -- What factors decide status
 
 -- getting all columns
@@ -213,5 +199,47 @@ for the sake of clear timeline, decided to drop them
 
 delete from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
  where launched <= '2009-01-01';
+
+-- ## Day 2 of analysis
+
+-- Finding important KPIs
+
+-- Get global success rate on Kickstart Platform : 36.46%
+with result as (
+  select
+    status,
+    count(*) as nr
+  from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+  group by status
+)
+select
+  ROUND((select result.nr from result where status=1)/SUM(nr) * 100, 2) as success_rate,
+  ROUND((select result.nr from result where status=0)/SUM(nr) * 100, 2) as failure_rate
+from result;
+
+-- goal vs pledged: goal - 18569252485.970009, pledged - 3658446439.390018, ratio - 0.19701635497466338
+select
+  SUM(goal) as total_goal,
+  SUM(pledged) as total_pledged,
+  SUM(pledged)/SUM(goal) as pledge_goal_ratio
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+create or replace view `data-analytics-ns-470609.kickstarter_project_analysis.once-ks-projects-ratio-by-category` as
+select
+  main_category,
+  SUM(goal) as total_goal,
+  SUM(pledged) as total_pledged,
+  SUM(pledged)/SUM(goal) as pledge_goal_ratio
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+group by main_category;
+
+-- AVG funding per project -
+-- 1. Average across all projects:
+select
+  avg(pledged) as avg_funding_mean,
+  PERCENTILE_CONT(pledged, 0.5) over (PARTITION BY category) AS avg_funding_median,
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+
 
   

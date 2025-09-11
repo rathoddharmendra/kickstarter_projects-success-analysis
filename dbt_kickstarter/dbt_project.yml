@@ -1,0 +1,42 @@
+name: 'kickstarter_analysis'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'kickstarter_analysis'
+
+# These configurations specify where dbt should look for different types of files.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configuring models
+models:
+  kickstarter_analysis:
+    # Config indicated by + and applies to all files under models/example/
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+    intermediate:
+      +materialized: view
+
+# Variables
+vars:
+  # Raw table reference
+  raw_table: "{{ ref('ks_projects_raw') }}"
+  
+  # Date filters
+  min_launch_date: '2009-01-02'  # Filter out invalid dates before this
+  
+  # Status mapping
+  failed_states: ['failed', 'canceled', 'suspended']
+  success_states: ['successful', 'live']

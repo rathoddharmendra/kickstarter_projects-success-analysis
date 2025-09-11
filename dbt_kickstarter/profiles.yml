@@ -1,0 +1,22 @@
+kickstarter_analysis:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: data-analytics-ns-470609  # Update with your GCP project ID
+      dataset: kickstarter_project_analysis
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      keyfile: /path/to/your/service-account-key.json  # Update with your service account key path
+      
+    prod:
+      type: bigquery
+      method: service-account
+      project: data-analytics-ns-470609  # Update with your GCP project ID
+      dataset: kickstarter_project_analysis_prod
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      keyfile: /path/to/your/service-account-key.json  # Update with your service account key path

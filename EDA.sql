@@ -241,5 +241,43 @@ select
 from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
 
 
+-- handling typo in country names as N'O" doesn't make sense in visual
+
+select
+  distinct country
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
+
+select
+  *
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+where country like 'N,0"';
+
+-- seems like N,0" is a typo for null values: found 235 corrupt entries
+-- trial 1 - impeding correct country code by currency used
+
+with res as (
+  select
+  *
+from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+where country like 'N,0"'
+)
+
+select 
+  distinct currency
+from res
+
+alter table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+set country = (
+  when 'EUR' then ''
+)
+where country like 'N,0"'
+
+-- cleaning data : removing outliers on deadlines and launched datetime
+-- converting to datetime
+
+
+
+
+
 
   

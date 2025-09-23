@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: kickstarter
+    description: Raw Kickstarter projects data
+    tables:
+      - name: ks-projects-2018
+        description: Kickstarter projects dataset from 2018
+        columns:
+          - name: ID
+            description: Unique project identifier
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: Project name
+          - name: category
+            description: Project subcategory
+          - name: main_category
+            description: Project main category
+          - name: currency
+            description: Currency used for the project
+          - name: deadline
+            description: Project deadline date
+          - name: goal
+            description: Funding goal amount
+          - name: launched
+            description: Project launch timestamp
+          - name: pledged
+            description: Amount pledged by backers
+          - name: state
+            description: Project state (successful, failed, etc.)
+          - name: backers
+            description: Number of backers
+          - name: country
+            description: Project country code

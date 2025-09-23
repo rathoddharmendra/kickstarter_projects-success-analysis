@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: stg_ks_projects_raw
+    description: "Staging table for raw Kickstarter projects data"
+    columns:
+      - name: project_id
+        description: "Unique project identifier"
+        tests:
+          - unique
+          - not_null
+      - name: project_name
+        description: "Name of the project"
+      - name: main_category
+        description: "Main category of the project"
+        tests:
+          - not_null
+      - name: state
+        description: "Current state of the project"
+        tests:
+          - accepted_values:
+              values: ['successful', 'failed', 'canceled', 'suspended', 'live']
+
+  - name: int_ks_projects_clean
+    description: "Intermediate cleaned projects with status and funding classifications"
+    columns:
+      - name: project_id
+        description: "Unique project identifier"
+        tests:
+          - unique
+          - not_null
+      - name: status
+        description: "Binary status: 0 for failed, 1 for successful"
+        tests:
+          - accepted_values:
+              values: [0, 1]
+      - name: funding_status
+        description: "Categorical funding status"
+        tests:
+          - accepted_values:
+              values: ['Fully Funded', 'Nearly Funded', 'Not Nearly Funded', 'Unknown']
+
+  - name: mart_ks_projects_clean
+    description: "Final cleaned projects table for analysis"
+    columns:
+      - name: project_id
+        description: "Unique project identifier"
+        tests:
+          - unique
+          - not_null
+
+  - name: mart_ks_projects_category_analysis
+    description: "Category-level analysis with success rates and metrics"
+    columns:
+      - name: main_category
+        description: "Main project category"
+        tests:
+          - unique
+          - not_null
+      - name: success_rate_pct
+        description: "Success rate percentage for the category"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: mart_ks_global_metrics
+    description: "Global platform KPIs and metrics"
+    columns:
+      - name: total_projects
+        description: "Total number of projects"
+        tests:
+          - not_null
+      - name: global_success_rate_pct
+        description: "Overall platform success rate"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100

@@ -1,4 +1,5 @@
-# 📊 Analyzing Kickstarter Dataset — A Product Mindset Approach
+# About Project
+📊 Analyzing Kickstarter Dataset — A Product Mindset Approach
 
 `Blending both my skills from PdM days, and as a data analyst`
 
@@ -9,7 +10,7 @@ This project analyzes the [Kickstarter dataset](https://www.kaggle.com/datasets/
 ---
 
 ## 📑 Table of Contents
-- [📊 Analyzing Kickstarter Dataset — A Product Mindset Approach](#-analyzing-kickstarter-dataset--a-product-mindset-approach)
+- [About Project](#about-project)
   - [📑 Table of Contents](#-table-of-contents)
   - [🎯 Current Goals](#-current-goals)
   - [👥 Who Will Benefit](#-who-will-benefit)

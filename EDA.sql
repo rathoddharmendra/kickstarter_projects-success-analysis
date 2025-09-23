@@ -248,7 +248,7 @@ select
 from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`;
 
 select
-  *
+  count(*)
 from `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
 where country like 'N,0"';
 
@@ -266,11 +266,18 @@ select
   distinct currency
 from res
 
-alter table `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
-set country = (
-  when 'EUR' then ''
-)
-where country like 'N,0"'
+update `data-analytics-ns-470609.kickstarter_project_analysis.ks-projects-clean`
+set country = CASE currency
+  when 'EUR' then 'FR' -- choosing France as representative Eurozone country
+  when 'USD' then 'US'
+  when 'GBP' then 'GB'
+  when 'CAD' then 'CA'
+  when 'AUD' then 'AU'
+  when 'DKK' then 'DE'
+  when 'NOK' then 'NO'
+  when 'SEK' then 'SE'
+END
+where country like 'N,0"';
 
 -- cleaning data : removing outliers on deadlines and launched datetime
 -- converting to datetime
